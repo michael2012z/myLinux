@@ -570,6 +570,7 @@ static u64 __of_translate_address(struct device_node *dev,
 	int na, ns, pna, pns;
 	u64 result = OF_BAD_ADDR;
 
+	pr_err("michael: __of_translate_address: flag 0\n");
 	pr_debug("** translation for device %pOF **\n", dev);
 
 	/* Increase refcount at current level */
@@ -580,6 +581,7 @@ static u64 __of_translate_address(struct device_node *dev,
 	if (parent == NULL)
 		goto bail;
 	bus = of_match_bus(parent);
+	pr_err("michael: __of_translate_address: flag 1\n");
 
 	/* Count address cells & copy address locally */
 	bus->count_cells(dev, &na, &ns);
@@ -588,6 +590,7 @@ static u64 __of_translate_address(struct device_node *dev,
 		goto bail;
 	}
 	memcpy(addr, in_addr, na * 4);
+	pr_err("michael: __of_translate_address: flag 2\n");
 
 	pr_debug("bus is %s (na=%d, ns=%d) on %pOF\n",
 	    bus->name, na, ns, parent);
@@ -599,6 +602,7 @@ static u64 __of_translate_address(struct device_node *dev,
 		of_node_put(dev);
 		dev = parent;
 		parent = of_get_parent(dev);
+		pr_err("michael: __of_translate_address: flag 3\n");
 
 		/* If root, we have finished */
 		if (parent == NULL) {
@@ -606,6 +610,8 @@ static u64 __of_translate_address(struct device_node *dev,
 			result = of_read_number(addr, na);
 			break;
 		}
+		
+		pr_err("michael: __of_translate_address: flag 4\n");
 
 		/* Get new parent bus and counts */
 		pbus = of_match_bus(parent);
@@ -615,12 +621,16 @@ static u64 __of_translate_address(struct device_node *dev,
 			break;
 		}
 
+		pr_err("michael: __of_translate_address: flag 5\n");
+
 		pr_debug("parent bus is %s (na=%d, ns=%d) on %pOF\n",
 		    pbus->name, pna, pns, parent);
 
 		/* Apply bus translation */
 		if (of_translate_one(dev, bus, pbus, addr, na, ns, pna, rprop))
 			break;
+
+		pr_err("michael: __of_translate_address: flag 6\n");
 
 		/* Complete the move up one level */
 		na = pna;
