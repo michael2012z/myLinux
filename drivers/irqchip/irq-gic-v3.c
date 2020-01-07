@@ -1184,6 +1184,8 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
 
 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
 	gic_set_kvm_info(&gic_v3_kvm_info);
+	pr_err("michael: gic_of_setup_kvm_info : flag 0 \n");
+
 }
 
 static int __init gic_of_init(struct device_node *node, struct device_node *parent)
@@ -1481,12 +1483,15 @@ static void __init gic_acpi_setup_kvm_info(void)
 
 	gic_v3_kvm_info.maint_irq = irq;
 
+	pr_err("michael: gic_acpi_setup_kvm_info : flag 0 \n");
+			
 	if (acpi_data.vcpu_base) {
 		struct resource *vcpu = &gic_v3_kvm_info.vcpu;
 
 		vcpu->flags = IORESOURCE_MEM;
 		vcpu->start = acpi_data.vcpu_base;
 		vcpu->end = vcpu->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
+		pr_err("michael: gic_acpi_setup_kvm_info : flag 1 \n");
 	}
 
 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;

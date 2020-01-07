@@ -531,18 +531,22 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
 	}
 
 	if (!info->vcpu.start) {
+        kvm_err("michael vgic_v3_probe: flag 1 \n");
 		kvm_info("GICv3: no GICV resource entry\n");
 		kvm_vgic_global_state.vcpu_base = 0;
 	} else if (!PAGE_ALIGNED(info->vcpu.start)) {
+        kvm_err("michael vgic_v3_probe: flag 2 \n");
 		pr_warn("GICV physical address 0x%llx not page aligned\n",
 			(unsigned long long)info->vcpu.start);
 		kvm_vgic_global_state.vcpu_base = 0;
 	} else if (!PAGE_ALIGNED(resource_size(&info->vcpu))) {
+        kvm_err("michael vgic_v3_probe: flag 3 \n");
 		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
 			(unsigned long long)resource_size(&info->vcpu),
 			PAGE_SIZE);
 		kvm_vgic_global_state.vcpu_base = 0;
 	} else {
+        kvm_err("michael vgic_v3_probe: flag 4 \n");
 		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
 		kvm_vgic_global_state.can_emulate_gicv2 = true;
 		ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V2);
@@ -550,6 +554,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
 			kvm_err("Cannot register GICv2 KVM device.\n");
 			return ret;
 		}
+        kvm_err("michael vgic_v3_probe: flag 5 \n");
 		kvm_info("vgic-v2@%llx\n", info->vcpu.start);
 	}
 	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
