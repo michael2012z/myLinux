@@ -717,11 +717,11 @@ static int __of_address_to_resource(struct device_node *dev,
 		pr_err("michael: __of_address_to_resource: flag 3\n");
 		if (port == (unsigned long)-1)
 			return -EINVAL;
-		pr_err("michael: __of_address_to_resource: flag 4: %d\n", port);
+		pr_err("michael: __of_address_to_resource: flag 4: %lu\n", port);
 		r->start = port;
 		r->end = port + size - 1;
 	} else {
-		pr_err("michael: __of_address_to_resource: flag 5: %d\n", taddr);
+		pr_err("michael: __of_address_to_resource: flag 5: %lu\n", taddr);
 		r->start = taddr;
 		r->end = taddr + size - 1;
 	}

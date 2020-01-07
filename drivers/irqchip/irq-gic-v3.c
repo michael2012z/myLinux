@@ -1184,7 +1184,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
 
 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
 	gic_set_kvm_info(&gic_v3_kvm_info);
-	pr_err("michael: gic_of_setup_kvm_info : flag 0 \n");
+	pr_err("michael: gic_of_setup_kvm_info : flag 0, vcpu.start = %lu \n", gic_v3_kvm_info.vcpu.start);
 
 }
 
