@@ -1179,12 +1179,14 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
 
 	gicv_idx += 3;	/* Also skip GICD, GICC, GICH */
 	ret = of_address_to_resource(node, gicv_idx, &r);
-	if (!ret)
+	pr_err("michael: gic_of_setup_kvm_info : flag 0, ret = %d, r.start = %lu \n", ret, r.start);
+	if (!ret) {
 		gic_v3_kvm_info.vcpu = r;
-
+		
+	}
 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
 	gic_set_kvm_info(&gic_v3_kvm_info);
-	pr_err("michael: gic_of_setup_kvm_info : flag 0, vcpu.start = %lu \n", gic_v3_kvm_info.vcpu.start);
+	pr_err("michael: gic_of_setup_kvm_info : flag 1, vcpu.start = %lu \n", gic_v3_kvm_info.vcpu.start);
 
 }
 
