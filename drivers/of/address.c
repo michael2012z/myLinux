@@ -570,7 +570,6 @@ static u64 __of_translate_address(struct device_node *dev,
 	int na, ns, pna, pns;
 	u64 result = OF_BAD_ADDR;
 
-	pr_err("michael: __of_translate_address: flag 0\n");
 	pr_debug("** translation for device %pOF **\n", dev);
 
 	/* Increase refcount at current level */
@@ -581,7 +580,6 @@ static u64 __of_translate_address(struct device_node *dev,
 	if (parent == NULL)
 		goto bail;
 	bus = of_match_bus(parent);
-	pr_err("michael: __of_translate_address: flag 1\n");
 
 	/* Count address cells & copy address locally */
 	bus->count_cells(dev, &na, &ns);
@@ -590,7 +588,6 @@ static u64 __of_translate_address(struct device_node *dev,
 		goto bail;
 	}
 	memcpy(addr, in_addr, na * 4);
-	pr_err("michael: __of_translate_address: flag 2\n");
 
 	pr_debug("bus is %s (na=%d, ns=%d) on %pOF\n",
 	    bus->name, na, ns, parent);
@@ -602,7 +599,6 @@ static u64 __of_translate_address(struct device_node *dev,
 		of_node_put(dev);
 		dev = parent;
 		parent = of_get_parent(dev);
-		pr_err("michael: __of_translate_address: flag 3\n");
 
 		/* If root, we have finished */
 		if (parent == NULL) {
@@ -611,8 +607,6 @@ static u64 __of_translate_address(struct device_node *dev,
 			break;
 		}
 		
-		pr_err("michael: __of_translate_address: flag 4\n");
-
 		/* Get new parent bus and counts */
 		pbus = of_match_bus(parent);
 		pbus->count_cells(dev, &pna, &pns);
@@ -621,16 +615,12 @@ static u64 __of_translate_address(struct device_node *dev,
 			break;
 		}
 
-		pr_err("michael: __of_translate_address: flag 5\n");
-
 		pr_debug("parent bus is %s (na=%d, ns=%d) on %pOF\n",
 		    pbus->name, pna, pns, parent);
 
 		/* Apply bus translation */
 		if (of_translate_one(dev, bus, pbus, addr, na, ns, pna, rprop))
 			break;
-
-		pr_err("michael: __of_translate_address: flag 6\n");
 
 		/* Complete the move up one level */
 		na = pna;
@@ -667,20 +657,30 @@ const __be32 *of_get_address(struct device_node *dev, int index, u64 *size,
 	struct of_bus *bus;
 	int onesize, i, na, ns;
 
+	pr_err("michael: of_get_address: flag 0\n");
+	
 	/* Get parent & match bus type */
 	parent = of_get_parent(dev);
 	if (parent == NULL)
 		return NULL;
+
+	pr_err("michael: of_get_address: flag 1\n");
+
 	bus = of_match_bus(parent);
 	bus->count_cells(dev, &na, &ns);
 	of_node_put(parent);
 	if (!OF_CHECK_ADDR_COUNT(na))
 		return NULL;
 
+	pr_err("michael: of_get_address: flag 2\n");
+	
 	/* Get "reg" or "assigned-addresses" property */
 	prop = of_get_property(dev, bus->addresses, &psize);
 	if (prop == NULL)
 		return NULL;
+
+	pr_err("michael: of_get_address: flag 3\n");
+	
 	psize /= 4;
 
 	onesize = na + ns;
@@ -692,6 +692,8 @@ const __be32 *of_get_address(struct device_node *dev, int index, u64 *size,
 				*flags = bus->get_flags(prop);
 			return prop;
 		}
+	pr_err("michael: of_get_address: flag 4\n");
+	
 	return NULL;
 }
 EXPORT_SYMBOL(of_get_address);
@@ -702,26 +704,24 @@ static int __of_address_to_resource(struct device_node *dev,
 {
 	u64 taddr;
 
-	pr_err("michael: __of_address_to_resource: flag 0\n");
 	if ((flags & (IORESOURCE_IO | IORESOURCE_MEM)) == 0)
 		return -EINVAL;
-	pr_err("michael: __of_address_to_resource: flag 1\n");
+
 	taddr = of_translate_address(dev, addrp);
 	if (taddr == OF_BAD_ADDR)
 		return -EINVAL;
-	pr_err("michael: __of_address_to_resource: flag 2\n");
+
 	memset(r, 0, sizeof(struct resource));
 	if (flags & IORESOURCE_IO) {
 		unsigned long port;
 		port = pci_address_to_pio(taddr);
-		pr_err("michael: __of_address_to_resource: flag 3\n");
+
 		if (port == (unsigned long)-1)
 			return -EINVAL;
-		pr_err("michael: __of_address_to_resource: flag 4: %lu\n", port);
+
 		r->start = port;
 		r->end = port + size - 1;
 	} else {
-		pr_err("michael: __of_address_to_resource: flag 5: %lu\n", taddr);
 		r->start = taddr;
 		r->end = taddr + size - 1;
 	}
