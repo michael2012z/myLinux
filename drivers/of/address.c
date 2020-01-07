@@ -692,11 +692,14 @@ static int __of_address_to_resource(struct device_node *dev,
 {
 	u64 taddr;
 
+	pr_err("michael: __of_address_to_resource: flag 0\n");
 	if ((flags & (IORESOURCE_IO | IORESOURCE_MEM)) == 0)
 		return -EINVAL;
+	pr_err("michael: __of_address_to_resource: flag 1\n");
 	taddr = of_translate_address(dev, addrp);
 	if (taddr == OF_BAD_ADDR)
 		return -EINVAL;
+	pr_err("michael: __of_address_to_resource: flag 2\n");
 	memset(r, 0, sizeof(struct resource));
 	if (flags & IORESOURCE_IO) {
 		unsigned long port;
