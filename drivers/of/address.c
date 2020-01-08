@@ -684,6 +684,7 @@ const __be32 *of_get_address(struct device_node *dev, int index, u64 *size,
 	psize /= 4;
 
 	onesize = na + ns;
+	pr_err("michael: index = %d, psize = %u, onesize = %u\n", index, psize, onesize);
 	for (i = 0; psize >= onesize; psize -= onesize, prop += onesize, i++)
 		if (i == index) {
 			if (size)
