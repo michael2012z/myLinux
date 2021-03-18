@@ -1947,6 +1947,7 @@ static int acpi_scan_attach_handler(struct acpi_device *device)
     
 		handler = acpi_scan_match_handler(hwid->id, &devid);
 		if (handler) {
+            pr_info("##### acpi_scan_attach_handler 2\n");
 			if (!handler->attach) {
 				device->pnp.type.platform_id = 0;
 				continue;
@@ -1971,7 +1972,8 @@ static void acpi_bus_attach(struct acpi_device *device)
 	acpi_handle ejd;
 	int ret;
 
-    pr_info("##### acpi_bus_attach 0\n");
+    pr_info("##### acpi_bus_attach 0: device bus_id: %s\n", device->pnp.bus_id);
+    
 
 	if (ACPI_SUCCESS(acpi_bus_get_ejd(device->handle, &ejd)))
 		register_dock_dependent_device(device, ejd);
