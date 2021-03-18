@@ -2537,22 +2537,31 @@ static int pl011_probe_dt_alias(int index, struct device *dev)
 	static bool seen_dev_without_alias = false;
 	int ret = index;
 
+    pr_info("----- pl011_probe_dt_alias: 0\n");
+    
 	if (!IS_ENABLED(CONFIG_OF))
 		return ret;
 
+    pr_info("----- pl011_probe_dt_alias: 1\n");
+    
 	np = dev->of_node;
 	if (!np)
 		return ret;
 
+    pr_info("----- pl011_probe_dt_alias: 2\n");
+    
 	ret = of_alias_get_id(np, "serial");
 	if (ret < 0) {
 		seen_dev_without_alias = true;
 		ret = index;
+        pr_info("----- pl011_probe_dt_alias: 3: ret = %d\n", ret);
+    
 	} else {
 		seen_dev_with_alias = true;
 		if (ret >= ARRAY_SIZE(amba_ports) || amba_ports[ret] != NULL) {
 			dev_warn(dev, "requested serial port %d  not available.\n", ret);
 			ret = index;
+        pr_info("----- pl011_probe_dt_alias: 4: ret = %d\n", ret);
 		}
 	}
 
@@ -2619,11 +2628,16 @@ static int pl011_register_port(struct uart_amba_port *uap)
 {
 	int ret, i;
 
+    pr_info("------ pl011_register_port: 0\n");
+
 	/* Ensure interrupts from this UART are masked and cleared */
 	pl011_write(0, uap, REG_IMSC);
 	pl011_write(0xffff, uap, REG_ICR);
 
+    pr_info("------ pl011_register_port: 1\n");
 	if (!amba_reg.state) {
+          pr_info("------ pl011_register_port: 2\n");
+
 		ret = uart_register_driver(&amba_reg);
 		if (ret < 0) {
 			dev_err(uap->port.dev,
@@ -2635,9 +2649,13 @@ static int pl011_register_port(struct uart_amba_port *uap)
 		}
 	}
 
+    pr_info("------ pl011_register_port: 3\n");
+
 	ret = uart_add_one_port(&amba_reg, &uap->port);
 	if (ret)
 		pl011_unregister_port(uap);
+
+    pr_info("------ pl011_register_port: ret = %d\n", ret);
 
 	return ret;
 }
@@ -2648,18 +2666,26 @@ static int pl011_probe(struct amba_device *dev, const struct amba_id *id)
 	struct vendor_data *vendor = id->data;
 	int portnr, ret;
 
+    pr_info("------ pl011_probe: 0\n");
+    
 	portnr = pl011_find_free_port();
 	if (portnr < 0)
 		return portnr;
+
+    pr_info("------ pl011_probe: 1\n");
 
 	uap = devm_kzalloc(&dev->dev, sizeof(struct uart_amba_port),
 			   GFP_KERNEL);
 	if (!uap)
 		return -ENOMEM;
 
+    pr_info("------ pl011_probe: 2\n");
+
 	uap->clk = devm_clk_get(&dev->dev, NULL);
 	if (IS_ERR(uap->clk))
 		return PTR_ERR(uap->clk);
+
+    pr_info("------ pl011_probe: 3\n");
 
 	uap->reg_offset = vendor->reg_offset;
 	uap->vendor = vendor;
@@ -2673,6 +2699,8 @@ static int pl011_probe(struct amba_device *dev, const struct amba_id *id)
 	ret = pl011_setup_port(&dev->dev, uap, &dev->res, portnr);
 	if (ret)
 		return ret;
+
+    pr_info("------ pl011_probe: 4\n");
 
 	amba_set_drvdata(dev, uap);
 
@@ -2719,6 +2747,8 @@ static int sbsa_uart_probe(struct platform_device *pdev)
 	int portnr, ret;
 	int baudrate;
 
+    pr_info("------ sbsa_uart_probe: 0\n");
+    
 	/*
 	 * Check the mandatory baud rate parameter in the DT node early
 	 * so that we can easily exit with the error.
@@ -2727,20 +2757,29 @@ static int sbsa_uart_probe(struct platform_device *pdev)
 		struct device_node *np = pdev->dev.of_node;
 
 		ret = of_property_read_u32(np, "current-speed", &baudrate);
+
+        pr_info("------ sbsa_uart_probe: 1\n");
+    
 		if (ret)
 			return ret;
 	} else {
 		baudrate = 115200;
 	}
 
+    pr_info("------ sbsa_uart_probe: 2\n");
+
 	portnr = pl011_find_free_port();
 	if (portnr < 0)
 		return portnr;
+
+    pr_info("------ sbsa_uart_probe: 3\n");
 
 	uap = devm_kzalloc(&pdev->dev, sizeof(struct uart_amba_port),
 			   GFP_KERNEL);
 	if (!uap)
 		return -ENOMEM;
+
+    pr_info("------ sbsa_uart_probe: 4\n");
 
 	ret = platform_get_irq(pdev, 0);
 	if (ret < 0)
@@ -2765,11 +2804,15 @@ static int sbsa_uart_probe(struct platform_device *pdev)
 
 	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 
+    pr_info("------ sbsa_uart_probe: 5\n");
+
 	ret = pl011_setup_port(&pdev->dev, uap, r, portnr);
 	if (ret)
 		return ret;
 
 	platform_set_drvdata(pdev, uap);
+
+    pr_info("------ sbsa_uart_probe: 6\n");
 
 	return pl011_register_port(uap);
 }

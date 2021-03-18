@@ -94,6 +94,8 @@ int __init acpi_parse_spcr(bool enable_earlycon, bool enable_console)
 	int baud_rate;
 	int err;
 
+    pr_info("michael: acpi_parse_spcr: 0\n");
+    
 	if (acpi_disabled)
 		return -ENODEV;
 
@@ -124,6 +126,10 @@ int __init acpi_parse_spcr(bool enable_earlycon, bool enable_console)
 		}
 	} else
 		iotype = "io";
+
+    pr_info("michael: acpi_parse_spcr: iotype = %s\n", iotype);
+    pr_info("michael: acpi_parse_spcr: interface_type = %x\n", table->interface_type);
+    pr_info("michael: acpi_parse_spcr: baud_rate = %d\n", table->baud_rate);
 
 	switch (table->interface_type) {
 	case ACPI_DBG2_ARM_SBSA_32BIT:

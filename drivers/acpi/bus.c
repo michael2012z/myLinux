@@ -1232,11 +1232,14 @@ EXPORT_SYMBOL_GPL(acpi_kobj);
 static int __init acpi_init(void)
 {
 	int result;
+    pr_info("##### acpi_init 0\n");
 
 	if (acpi_disabled) {
 		printk(KERN_INFO PREFIX "Interpreter disabled.\n");
 		return -ENODEV;
 	}
+
+    pr_info("##### acpi_init 1\n");
 
 	acpi_kobj = kobject_create_and_add("acpi", firmware_kobj);
 	if (!acpi_kobj) {
@@ -1250,16 +1253,28 @@ static int __init acpi_init(void)
 		return result;
 	}
 
+    pr_info("##### acpi_init 2\n");
+    
 	pci_mmcfg_late_init();
+    pr_info("##### acpi_init 3\n");
 	acpi_iort_init();
+    pr_info("##### acpi_init 4\n");
 	acpi_viot_init();
+    pr_info("##### acpi_init 5\n");
 	acpi_scan_init();
+    pr_info("##### acpi_init 6\n");
 	acpi_ec_init();
+    pr_info("##### acpi_init 7\n");
 	acpi_debugfs_init();
+    pr_info("##### acpi_init 8\n");
 	acpi_sleep_proc_init();
+    pr_info("##### acpi_init 9\n");
 	acpi_wakeup_device_init();
+    pr_info("##### acpi_init a\n");
 	acpi_debugger_init();
+    pr_info("##### acpi_init b\n");
 	acpi_setup_sb_notify_handler();
+    pr_info("##### acpi_init c\n");
 	return 0;
 }
 

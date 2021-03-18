@@ -1937,10 +1937,14 @@ static int acpi_scan_attach_handler(struct acpi_device *device)
 	struct acpi_hardware_id *hwid;
 	int ret = 0;
 
+    pr_info("##### acpi_scan_attach_handler 0\n");
+
 	list_for_each_entry(hwid, &device->pnp.ids, list) {
 		const struct acpi_device_id *devid;
 		struct acpi_scan_handler *handler;
 
+        pr_info("##### acpi_scan_attach_handler 1\n");
+    
 		handler = acpi_scan_match_handler(hwid->id, &devid);
 		if (handler) {
 			if (!handler->attach) {
@@ -1967,6 +1971,8 @@ static void acpi_bus_attach(struct acpi_device *device)
 	acpi_handle ejd;
 	int ret;
 
+    pr_info("##### acpi_bus_attach 0\n");
+
 	if (ACPI_SUCCESS(acpi_bus_get_ejd(device->handle, &ejd)))
 		register_dock_dependent_device(device, ejd);
 
@@ -1978,9 +1984,11 @@ static void acpi_bus_attach(struct acpi_device *device)
 		device->flags.power_manageable = 0;
 		return;
 	}
+    pr_info("##### acpi_bus_attach 1\n");
 	if (device->handler)
 		goto ok;
 
+    pr_info("##### acpi_bus_attach 2\n");
 	if (!device->flags.initialized) {
 		device->flags.power_manageable =
 			device->power.states[ACPI_STATE_D0].flags.valid;
@@ -1992,6 +2000,7 @@ static void acpi_bus_attach(struct acpi_device *device)
 		goto ok;
 	}
 
+    pr_info("##### acpi_bus_attach 3\n");
 	ret = acpi_scan_attach_handler(device);
 	if (ret < 0)
 		return;
@@ -2012,6 +2021,7 @@ static void acpi_bus_attach(struct acpi_device *device)
 		acpi_device_set_enumerated(device);
 
  ok:
+    pr_info("##### acpi_bus_attach 4\n");
 	list_for_each_entry(child, &device->children, node)
 		acpi_bus_attach(child);
 
@@ -2024,6 +2034,8 @@ void acpi_walk_dep_device_list(acpi_handle handle)
 	struct acpi_dep_data *dep, *tmp;
 	struct acpi_device *adev;
 
+    pr_info("##### acpi_walk_dep_device_list 0\n");
+
 	mutex_lock(&acpi_dep_list_lock);
 	list_for_each_entry_safe(dep, tmp, &acpi_dep_list, node) {
 		if (dep->master == handle) {
@@ -2032,13 +2044,17 @@ void acpi_walk_dep_device_list(acpi_handle handle)
 				continue;
 
 			adev->dep_unmet--;
-			if (!adev->dep_unmet)
+			if (!adev->dep_unmet) {
+              pr_info("##### acpi_walk_dep_device_list 1\n");
 				acpi_bus_attach(adev);
+            }
 			list_del(&dep->node);
 			kfree(dep);
 		}
 	}
 	mutex_unlock(&acpi_dep_list_lock);
+    pr_info("##### acpi_walk_dep_device_list 2\n");
+
 }
 EXPORT_SYMBOL_GPL(acpi_walk_dep_device_list);
 
@@ -2060,11 +2076,14 @@ int acpi_bus_scan(acpi_handle handle)
 {
 	void *device = NULL;
 
+    pr_info("##### acpi_bus_scan 0\n");
+    
 	if (ACPI_SUCCESS(acpi_bus_check_add(handle, 0, NULL, &device)))
 		acpi_walk_namespace(ACPI_TYPE_ANY, handle, ACPI_UINT32_MAX,
 				    acpi_bus_check_add, NULL, NULL, &device);
 
 	if (device) {
+      pr_info("##### acpi_bus_scan 1\n");
 		acpi_bus_attach(device);
 		return 0;
 	}
@@ -2184,6 +2203,8 @@ int __init acpi_scan_init(void)
 	acpi_status status;
 	struct acpi_table_stao *stao_ptr;
 
+    pr_info("##### acpi_scan_init 0\n");
+    
 	acpi_pci_root_init();
 	acpi_pci_link_init();
 	acpi_processor_init();

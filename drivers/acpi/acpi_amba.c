@@ -55,9 +55,13 @@ static int amba_handler_attach(struct acpi_device *adev,
 	int irq_no = 0;
 	int ret;
 
+    pr_info("##### amba_handler_attach 0\n");
+    
 	/* If the ACPI node already has a physical device attached, skip it. */
 	if (adev->physical_node_count)
 		return 0;
+
+    pr_info("##### amba_handler_attach 1\n");
 
 	dev = amba_device_alloc(dev_name(&adev->dev), 0, 0);
 	if (!dev) {
@@ -122,6 +126,7 @@ static struct acpi_scan_handler amba_handler = {
 
 void __init acpi_amba_init(void)
 {
+  pr_info("##### acpi_amba_init\n");
 	amba_register_dummy_clk();
 	acpi_scan_add_handler(&amba_handler);
 }

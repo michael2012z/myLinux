@@ -46,6 +46,7 @@ amba_cs_uci_id_match(const struct amba_id *table, struct amba_device *dev)
 static const struct amba_id *
 amba_lookup(const struct amba_id *table, struct amba_device *dev)
 {
+    pr_info("########### amba_lookup\n");
 	while (table->mask) {
 		if (((dev->periphid & table->mask) == table->id) &&
 			((dev->cid != CORESIGHT_CID) ||
@@ -61,6 +62,8 @@ static int amba_match(struct device *dev, struct device_driver *drv)
 	struct amba_device *pcdev = to_amba_device(dev);
 	struct amba_driver *pcdrv = to_amba_driver(drv);
 
+    pr_info("########### amba_match\n");
+    
 	/* When driver_override is set, only bind to the matching driver */
 	if (pcdev->driver_override)
 		return !strcmp(pcdev->driver_override, drv->name);
@@ -224,6 +227,8 @@ EXPORT_SYMBOL_GPL(amba_bustype);
 
 static int __init amba_init(void)
 {
+      pr_info("########### amba_init\n");
+
 	return bus_register(&amba_bustype);
 }
 
@@ -260,6 +265,7 @@ static int amba_probe(struct device *dev)
 	struct amba_driver *pcdrv = to_amba_driver(dev->driver);
 	const struct amba_id *id = amba_lookup(pcdrv->id_table, pcdev);
 	int ret;
+    pr_info("########### amba_probe\n");
 
 	do {
 		ret = of_clk_set_defaults(dev->of_node, false);
@@ -332,6 +338,7 @@ static void amba_shutdown(struct device *dev)
  */
 int amba_driver_register(struct amba_driver *drv)
 {
+    pr_info("########### amba_driver_register\n");
 	drv->drv.bus = &amba_bustype;
 
 #define SETFN(fn)	if (drv->fn) drv->drv.fn = amba_##fn
@@ -371,6 +378,8 @@ static int amba_device_try_add(struct amba_device *dev, struct resource *parent)
 	void __iomem *tmp;
 	int i, ret;
 
+    pr_info("########### amba_device_try_add\n");
+	
 	WARN_ON(dev->irq[0] == (unsigned int)-1);
 	WARN_ON(dev->irq[1] == (unsigned int)-1);
 
@@ -509,6 +518,8 @@ static int amba_deferred_retry(void)
 {
 	struct deferred_device *ddev, *tmp;
 
+    pr_info("########### amba_deferred_retry\n");
+
 	mutex_lock(&deferred_devices_lock);
 
 	list_for_each_entry_safe(ddev, tmp, &deferred_devices, node) {
@@ -549,6 +560,8 @@ int amba_device_add(struct amba_device *dev, struct resource *parent)
 {
 	int ret = amba_device_try_add(dev, parent);
 
+    pr_info("########### amba_device_add\n");
+
 	if (ret == -EPROBE_DEFER) {
 		struct deferred_device *ddev;
 
@@ -582,6 +595,8 @@ amba_aphb_device_add(struct device *parent, const char *name,
 	struct amba_device *dev;
 	int ret;
 
+    pr_info("########### amba_aphb_device_add\n");
+    
 	dev = amba_device_alloc(name, base, size);
 	if (!dev)
 		return ERR_PTR(-ENOMEM);
@@ -647,6 +662,7 @@ EXPORT_SYMBOL_GPL(amba_ahb_device_add_res);
 
 static void amba_device_initialize(struct amba_device *dev, const char *name)
 {
+    pr_info("########### amba_device_initialize\n");
 	device_initialize(&dev->dev);
 	if (name)
 		dev_set_name(&dev->dev, "%s", name);
@@ -671,6 +687,8 @@ struct amba_device *amba_device_alloc(const char *name, resource_size_t base,
 {
 	struct amba_device *dev;
 
+    pr_info("########### amba_device_alloc\n");
+
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (dev) {
 		amba_device_initialize(dev, name);
@@ -694,6 +712,8 @@ EXPORT_SYMBOL_GPL(amba_device_alloc);
  */
 int amba_device_register(struct amba_device *dev, struct resource *parent)
 {
+  pr_info("########### amba_device_register\n");
+  
 	amba_device_initialize(dev, dev->dev.init_name);
 	dev->dev.init_name = NULL;
 
@@ -706,6 +726,7 @@ int amba_device_register(struct amba_device *dev, struct resource *parent)
  */
 void amba_device_put(struct amba_device *dev)
 {
+    pr_info("########### amba_device_put\n");
 	put_device(&dev->dev);
 }
 EXPORT_SYMBOL_GPL(amba_device_put);
@@ -741,6 +762,8 @@ static int amba_find_match(struct device *dev, void *data)
 	struct amba_device *pcdev = to_amba_device(dev);
 	int r;
 
+    pr_info("########### amba_find_match\n");
+
 	r = (pcdev->periphid & d->mask) == d->id;
 	if (d->parent)
 		r &= d->parent == dev->parent;
@@ -775,6 +798,7 @@ amba_find_device(const char *busid, struct device *parent, unsigned int id,
 {
 	struct find_data data;
 
+    pr_info("########### amba_find_device\n");
 	data.dev = NULL;
 	data.parent = parent;
 	data.busid = busid;
@@ -798,6 +822,8 @@ int amba_request_regions(struct amba_device *dev, const char *name)
 
 	if (!name)
 		name = dev->dev.driver->name;
+
+    pr_info("########### amba_request_regions\n");
 
 	size = resource_size(&dev->res);
 

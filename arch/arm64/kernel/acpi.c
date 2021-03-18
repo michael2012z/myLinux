@@ -197,6 +197,8 @@ out:
  */
 void __init acpi_boot_table_init(void)
 {
+  pr_info("-------- michael: acpi_boot_table_init: 0\n");
+  
 	/*
 	 * Enable ACPI instead of device tree unless
 	 * - ACPI has been disabled explicitly (acpi=off), or
@@ -209,6 +211,7 @@ void __init acpi_boot_table_init(void)
 	     of_scan_flat_dt(dt_scan_depth1_nodes, NULL)))
 		goto done;
 
+    pr_info("-------- michael: acpi_boot_table_init: 1\n");
 	/*
 	 * ACPI is disabled at this point. Enable it in order to parse
 	 * the ACPI tables and carry out sanity checks
@@ -223,16 +226,21 @@ void __init acpi_boot_table_init(void)
 	 * to be enabled even if its initialization failed.
 	 */
 	if (acpi_table_init() || acpi_fadt_sanity_check()) {
+      pr_info("-------- michael: acpi_boot_table_init: 2\n");
 		pr_err("Failed to init ACPI tables\n");
-		if (!param_acpi_force)
+		if (!param_acpi_force) {
+            pr_info("-------- michael: acpi_boot_table_init: 3\n");
 			disable_acpi();
+        }
 	}
 
 done:
 	if (acpi_disabled) {
+        pr_info("-------- michael: acpi_boot_table_init: 4\n");
 		if (earlycon_acpi_spcr_enable)
 			early_init_dt_scan_chosen_stdout();
 	} else {
+        pr_info("-------- michael: acpi_boot_table_init: 5\n");
 		acpi_parse_spcr(earlycon_acpi_spcr_enable, true);
 		if (IS_ENABLED(CONFIG_ACPI_BGRT))
 			acpi_table_parse(ACPI_SIG_BGRT, acpi_parse_bgrt);
