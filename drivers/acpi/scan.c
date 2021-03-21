@@ -1559,7 +1559,7 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 		{}
 	};
 
-    pr_info("##### acpi_device_enumeration_by_parent 0\n");
+    pr_info("##### acpi_device_enumeration_by_parent 0: bus_id: %s\n", device->pnp.bus_id);
 
 	if (acpi_is_indirect_io_slave(device))
 		return true;
