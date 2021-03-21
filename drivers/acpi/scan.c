@@ -1559,9 +1559,12 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 		{}
 	};
 
+    pr_info("##### acpi_device_enumeration_by_parent 0\n");
+
 	if (acpi_is_indirect_io_slave(device))
 		return true;
 
+    pr_info("##### acpi_device_enumeration_by_parent 1\n");
 	/* Macs use device properties in lieu of _CRS resources */
 	if (x86_apple_machine &&
 	    (fwnode_property_present(&device->fwnode, "spiSclkPeriod") ||
@@ -1569,6 +1572,7 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 	     fwnode_property_present(&device->fwnode, "baud")))
 		return true;
 
+    pr_info("##### acpi_device_enumeration_by_parent 2\n");
 	/* Instantiate a pdev for the i2c-multi-instantiate drv to bind to */
 	if (!acpi_match_device_ids(device, i2c_multi_instantiate_ids))
 		return false;
@@ -1579,6 +1583,7 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 			       &is_serial_bus_slave);
 	acpi_dev_free_resource_list(&resource_list);
 
+    pr_info("##### acpi_device_enumeration_by_parent 3: is_serial_bus_slave = %d\n", is_serial_bus_slave);
 	return is_serial_bus_slave;
 }
 
@@ -2007,23 +2012,29 @@ static void acpi_bus_attach(struct acpi_device *device)
 	if (ret < 0)
 		return;
 
+    pr_info("##### acpi_bus_attach 4\n");
 	device->flags.match_driver = true;
 	if (ret > 0 && !device->flags.enumeration_by_parent) {
 		acpi_device_set_enumerated(device);
 		goto ok;
 	}
 
+    pr_info("##### acpi_bus_attach 5\n");
 	ret = device_attach(&device->dev);
 	if (ret < 0)
 		return;
 
-	if (device->pnp.type.platform_id || device->flags.enumeration_by_parent)
+    pr_info("##### acpi_bus_attach 6\n");
+	if (device->pnp.type.platform_id || device->flags.enumeration_by_parent) {
+        pr_info("##### acpi_bus_attach 7\n");
 		acpi_default_enumeration(device);
-	else
+	} else {
+        pr_info("##### acpi_bus_attach 8\n");
 		acpi_device_set_enumerated(device);
+    }
 
  ok:
-    pr_info("##### acpi_bus_attach 4\n");
+    pr_info("##### acpi_bus_attach 9\n");
 	list_for_each_entry(child, &device->children, node)
 		acpi_bus_attach(child);
 
