@@ -522,6 +522,10 @@ struct pi_entry {
 #define pr_info(fmt, ...) \
 	printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
 
+#define michael(fmt, ...) \
+        printk(KERN_INFO pr_fmt("michael: %s:%d: "fmt), __func__, __LINE__, \
+               ##__VA_ARGS__)
+
 /**
  * pr_cont - Continues a previous log message in the same line.
  * @fmt: format string
